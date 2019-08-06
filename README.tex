@@ -1,0 +1,286 @@
+# Wishart
+Tools for computing probability distributions of the largest eigenvalue of complex Wishart matrices in various cases.
+
+
+
+\section{Introduction}
+Included in this section is a description of MATLAB source code for computing the distribution of $\lambda_1$ using the closed form expressions under the various cases presented throughout this thesis, as well as ancillary code that is generally of interest to this problem. The code in question will be uploaded as a publically available github repository.
+
+\section{Wishart Matrix Tools}
+The following documented MATLAB scripts and functions are useful to compute the probability distribution of the largest eigenvalue $\lambda_1$ of a complex Wishart matrix under various cases of interest. In particular, these functions are designed for use in problems in which the size of the matrix $M\times M$ is reasonably small, while the degrees of freedom parameter $N$ is quite large. 
+
+The included functions for computing the distribution of $\lambda_1$ follow the below naming convention:
+
+[C, NC, S]\_[CDF, CCDF]\_[D, H, G, MC].m
+
+\noindent Such that the abbreviations are as follows:
+\begin{itemize}
+\item[-] [C, NC, S]: the type of complex Wishart matrix, (C)entral uncorrelated, (NC) non-central, or central correlated with (S)igma covariance. 
+\item[-] [CDF, CCDF]: computes the (CDF) or complementary CDF (CCDF), 1-CDF. 
+\item[-] [D,H,G,MC]: method of computing probabilities, (D) polynomials, (H)ermite polynomials, (G)amma functions, (MC) Monte Carlo. 
+\end{itemize}
+Note that the included functions do not exhaust the combinatorics of the above.
+
+\subsubsection*{C\_CDF\_D.m}
+
+Computes in closed form the central CDF of $\lambda_1$ using the D-polynomial formula given by (\ref{eq:F_D_H0}).
+
+\begin{itemize}
+\item Arguments:
+\begin{itemize}
+\item $M$: Size of the Wishart matrix
+\item $N$: Degrees of freedom
+\item $x$: Domain on which to compute values of the CDF.
+\end{itemize}
+\item Returns:
+\begin{itemize}
+\item $F$: CDF of $\lambda_1$
+\end{itemize}
+\end{itemize}
+
+\subsubsection*{C\_CDF\_G.m}
+
+Computes in closed form the central CDF of $\lambda_1$ using Khatri's gamma function formula given by (\ref{eq:F_khatri}). Note that this formulation will overflow for approximately $N \geq 100$. For exact overflow points, see Table \ref{tab:h0_num_lim}.
+
+\begin{itemize}
+\item Arguments:
+\begin{itemize}
+\item $M$: Size of the Wishart matrix
+\item $N$: Degrees of freedom
+\item $x$: Domain on which to compute values of the CDF.
+\end{itemize}
+\item Returns:
+\begin{itemize}
+\item $F$: CDF of $\lambda_1$
+\end{itemize}
+\end{itemize}
+
+
+\subsubsection*{C\_CDF\_H.m}
+
+Computes the central CDF of $\lambda_1$ using the Hermite polynomial formula given by (\ref{eq:F_H_H0}). Note that this is asymptotic in $N$ and thus most accurate for large values, but is computationally efficient as numerical quadrature integration is not required.
+
+\begin{itemize}
+\item Arguments:
+\begin{itemize}
+\item $M$: Size of the Wishart matrix
+\item $N$: Degrees of freedom
+\item $x$: Domain on which to compute values of the CDF.
+\end{itemize}
+\item Returns:
+\begin{itemize}
+\item $F$: CDF of $\lambda_1$
+\end{itemize}
+\end{itemize}
+
+
+
+\subsubsection*{C\_CDF\_MC.m}
+
+Generates an empirical CDF of $\lambda_1$ in the central case by generating pseudo-random complex Wishart matrices via a Bartlett decomposition as implemented in $wishrndC.m$.
+
+\begin{itemize}
+\item Arguments:
+\begin{itemize}
+\item $M$: Size of the Wishart matrix
+\item $N$: Degrees of freedom
+\item $nTrials$: Number of pseudo-random trials to perform, length of returns $F$ and $x$
+\end{itemize}
+\item Returns:
+\begin{itemize}
+\item $F$: CDF of $\lambda_1$
+\item $x$: Support of the CDF $F$
+\end{itemize}
+\end{itemize}
+
+
+
+
+\subsubsection*{C\_CDF\_IS.m}
+
+Generates an empirical CDF of $\lambda_1$ in the central case using the importance sampling algorithm discussed in \cite{Jiang_2014}.
+
+\begin{itemize}
+\item Arguments:
+\begin{itemize}
+\item $M$: Size of the Wishart matrix.
+\item $N$: Degrees of freedom.
+\item $x$: Support of the CDF $F$.
+\item $nTrials$: Number of pseudo-random trials to perform, length of returns $F$ and $x$
+\end{itemize}
+\item Returns:
+\begin{itemize}
+\item $F$: CDF of $\lambda_1$
+\end{itemize}
+\end{itemize}
+
+
+
+\subsubsection*{C\_CCDF\_D.m}
+
+Computes in closed form the central complementary CDF of $\lambda_1$ using the D-polynomial formula given by (\ref{eq:F_D_H0}). Uses certain identities of the determinant to eliminate subtraction errors when computing $1-F(x)$ when $F(x)$ is close to $1$.
+
+\begin{itemize}
+\item Arguments:
+\begin{itemize}
+\item $M$: Size of the Wishart matrix
+\item $N$: Degrees of freedom
+\item $x$: Domain on which to compute values of the CDF.
+\end{itemize}
+\item Returns:
+\begin{itemize}
+\item $F$: CDF of $\lambda_1$
+\end{itemize}
+\end{itemize}
+
+\subsubsection*{C\_CCDF\_H.m}
+
+Computes asymptotically the central complementary CDF of $\lambda_1$ using the Hermite polynomial formula given by (\ref{eq:F_D_H0}). Uses identities of the determinant to eliminate subtraction errors when computing $1-F(x)$ when $F(x)$ is close to $1$.
+
+\begin{itemize}
+\item Arguments:
+\begin{itemize}
+\item $M$: Size of the Wishart matrix
+\item $N$: Degrees of freedom
+\item $x$: Domain on which to compute values of the CDF.
+\end{itemize}
+\item Returns:
+\begin{itemize}
+\item $F$: CDF of $\lambda_1$
+\end{itemize}
+\end{itemize}
+
+\subsubsection*{NC\_CDF\_D.m}
+
+Computes in closed form the non-central CDF of $\lambda_1$ using the hypergeometric D-polynomial formula given by (\ref{eq:F_D_H1}). 
+
+\begin{itemize}
+\item Arguments:
+\begin{itemize}
+\item $M$: Size of the Wishart matrix
+\item $N$: Degrees of freedom
+\item $mu1$: Dominant (only non-zero) eigenvalue of the non-centrality Gram matrix
+\item $x$: Domain on which to compute values of the CDF.
+\end{itemize}
+\item Returns:
+\begin{itemize}
+\item $F$: CDF of $\lambda_1$
+\end{itemize}
+\end{itemize}
+
+
+\subsubsection*{NC\_CDF\_G.m}
+
+Computes in closed form the non-central CDF of $\lambda_1$ using the hypergeometric gamma function formula given by (\ref{eq:F_NC}). 
+
+\begin{itemize}
+\item Arguments:
+\begin{itemize}
+\item $M$: Size of the Wishart matrix
+\item $N$: Degrees of freedom
+\item $mu1$: Dominant (only non-zero) eigenvalue of the non-centrality Gram matrix
+\item $x$: Domain on which to compute values of the CDF.
+\end{itemize}
+\item Returns:
+\begin{itemize}
+\item $F$: CDF of $\lambda_1$
+\end{itemize}
+\end{itemize}
+
+
+
+
+\subsubsection*{NC\_CDF\_MC.m}
+
+Generates an empirical CDF of $\lambda_1$ in the non-central case by generating pseudo-random complex Wishart matrices via a direct Monte Carlo algorithm.
+
+\begin{itemize}
+\item Arguments:
+\begin{itemize}
+\item $M$: Size of the Wishart matrix
+\item $N$: Degrees of freedom
+\item $S$: $M\times N$ signal in the mean. Assuming $S$ is rank one, the largest eigenvalue of $S^\dagger S$ defines the SNR.
+\item $nTrials$: Number of pseudo-random trials to perform, length of returns $F$ and $x$
+\end{itemize}
+\item Returns:
+\begin{itemize}
+\item $F$: CDF of $\lambda_1$
+\item $x$: Support of the CDF $F$
+\end{itemize}
+\end{itemize}
+
+\subsubsection*{S\_CDF\_D.m}
+
+Computes in closed form the central correlated CDF of $\lambda_1$ using D-polynomial formula given by (\ref{eq:F_D_S}). 
+
+\begin{itemize}
+\item Arguments:
+\begin{itemize}
+\item $M$: Size of the Wishart matrix
+\item $N$: Degrees of freedom
+\item $sigma$: Length $M$ vector of the eigenvalues of the covariance matrix of the Wishart matrix
+\item $x$: Domain on which to compute values of the CDF.
+\end{itemize}
+\item Returns:
+\begin{itemize}
+\item $F$: CDF of $\lambda_1$
+\end{itemize}
+\end{itemize}
+
+\subsubsection*{S\_CDF\_G.m}
+
+Computes in closed form the central correlated CDF of $\lambda_1$ using gamma function formula given by (\ref{eq:F_uncorrelated}). 
+
+\begin{itemize}
+\item Arguments:
+\begin{itemize}
+\item $M$: Size of the Wishart matrix
+\item $N$: Degrees of freedom
+\item $sigma$: Length $M$ vector of the eigenvalues of the covariance matrix of the Wishart matrix
+\item $x$: Domain on which to compute values of the CDF.
+\end{itemize}
+\item Returns:
+\begin{itemize}
+\item $F$: CDF of $\lambda_1$
+\end{itemize}
+\end{itemize}
+
+
+
+
+\subsubsection*{S\_CDF\_MC.m}
+
+Generates an empirical CDF of $\lambda_1$ in the central correlated case by generating pseudo-random complex Wishart matrices via a Bartlett decomposition as implemented in $wishrndC.m$.
+
+\begin{itemize}
+\item Arguments:
+\begin{itemize}
+\item $M$: Size of the Wishart matrix
+\item $N$: Degrees of freedom
+\item $Sigma$: $M\times M$ covariance matrix for the Wishart distribution
+\item $nTrials$: Number of pseudo-random trials to perform, length of returns $F$ and $x$
+\end{itemize}
+\item Returns:
+\begin{itemize}
+\item $F$: CDF of $\lambda_1$
+\item $x$: Support of the CDF $F$
+\end{itemize}
+\end{itemize}
+
+\subsubsection*{wishrndC.m}
+
+Generates pseudo-random central complex Wishart matrices. For small values of $N$ directly generates a matrix $X$ and then computes the Wishart matrix $W=X^\dagger X$. For larger values of $N$, computes $W$ directly using the Bartlett decomposition. These generated matrices be used to generate empirical CDF's of $\lambda_1$.
+\begin{itemize}
+\item Arguments:
+\begin{itemize}
+\item $Sigma$: $M\times M$ covariance matrix, eye(M) for uncorrelated case, positive definite in general.
+\item $N$: Degrees of freedom
+\item $D$: Cholesky factorization of $Sigma$ - faster provided as argument if calling the function repeatedly.
+\item $n\_trials$: Number of matrixes to generate
+\end{itemize}
+\item Returns:
+\begin{itemize}
+\item $W$: $M\times M\times n\_trials$ array of Wishart matrices
+\item $D$ Cholesky factorization of $Sigma$
+\end{itemize}
+\end{itemize}
